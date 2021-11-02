@@ -1,16 +1,4 @@
 {
-    "name": "Drive",
-    "description": "Telegram-Direct-Mirror",
-    "logo": "https://telegra.ph/file/e15e9ac9c5885b015e3ab.jpg",
-    "keywords": [
-      "telegram",
-      "bot",
-      "aria",
-      "python"
-    ],
-    "repository": "https://github.com/Technical-Jigar/myherokubot.git",
-    "website": "https://github.com/Technical-Jigar/myherokubot/tree/main",
-    "success_url": "https://github.com/Technical-Jigar/myherokubot/blob/main/README.md",
     "stack": "container",
     "env": {
       "ENV": {
