@@ -1,6 +1,9 @@
+#base image
 FROM lzzy12/mega-sdk-python:latest
 
+#Workdir of project
 WORKDIR /usr/src/app
+#some cmds
 RUN chmod 777 /usr/src/app
 RUN apt-get --allow-releaseinfo-change-suite update 
 RUN apt-get -qq update && \
@@ -24,6 +27,7 @@ COPY . .
 COPY netrc /root/.netrc
 RUN chmod +x aria.sh
 
+#start cmd
 CMD ["bash","start.sh"]
 
 
