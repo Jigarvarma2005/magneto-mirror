@@ -56,11 +56,10 @@ class MegaAppListener(MegaListener):
         return self.__bytes_transferred
 
     def onRequestStart(self, api, request):
-        LOGGER.info('Request start ({})'.format(request))
+        LOGGER.info(f'Request start ({request})')
 
     def onRequestFinish(self, api, request, error):
-        LOGGER.info('Mega Request finished ({}); Result: {}'
-                    .format(request, error))
+        LOGGER.info(f'Mega Request finished ({request}); Result: {error}')
 
         request_type = request.getType()
         if request_type == MegaRequest.TYPE_LOGIN:
@@ -77,7 +76,7 @@ class MegaAppListener(MegaListener):
     def onRequestTemporaryError(self, api, request, error: MegaError):
         LOGGER.info(f'Mega Request error in {error}')
         if not self.is_cancelled:
-            self.listener.onDownloadError("RequestTempError: " + error.toString())
+            self.listener.onDownloadError(f"RequestTempError: {error.toString()}")
             self.is_cancelled = True
         self.error = error.toString()
         self.continue_event.set()
@@ -105,7 +104,7 @@ class MegaAppListener(MegaListener):
         self.error = error.toString()
         if not self.is_cancelled:
             self.is_cancelled = True
-            self.listener.onDownloadError("TransferTempError: "+self.error)
+            self.listener.onDownloadError(f"TransferTempError: {self.error}")
 
     def cancel_download(self):
         self.is_cancelled = True

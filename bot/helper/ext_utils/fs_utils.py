@@ -48,7 +48,7 @@ def get_path_size(path):
 
 
 def tar(org_path):
-    tar_path = org_path + ".tar"
+    tar_path = f"{org_path}.tar"
     path = pathlib.PurePath(org_path)
     LOGGER.info(f'Tar: orig_path: {org_path}, tar_path: {tar_path}')
     tar = tarfile.open(tar_path, "w")
