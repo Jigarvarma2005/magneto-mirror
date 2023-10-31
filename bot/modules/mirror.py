@@ -123,7 +123,6 @@ class MirrorListener(listeners.MirrorListeners):
                 LOGGER.info(str(download_dict))
             except Exception as e:
                 LOGGER.error(str(e))
-                pass
             count = len(download_dict)
         if self.message.from_user.username:
             uname = f"@{self.message.from_user.username}"
@@ -147,7 +146,9 @@ class MirrorListener(listeners.MirrorListeners):
             msg = f'<b>Filename : </b><code>{download_dict[self.uid].name()}</code>\n<b>Size : </b><code>{size}</code>'
             buttons = button_build.ButtonMaker()
             if SHORTENER is not None and SHORTENER_API is not None:
-                surl = requests.get('https://{}/api?api={}&url={}&format=text'.format(SHORTENER, SHORTENER_API, link)).text
+                surl = requests.get(
+                    f'https://{SHORTENER}/api?api={SHORTENER_API}&url={link}&format=text'
+                ).text
                 buttons.buildbutton("Drive Link", surl)
             else:
                 buttons.buildbutton("Drive Link", link)
@@ -157,7 +158,9 @@ class MirrorListener(listeners.MirrorListeners):
                 if os.path.isdir(f'{DOWNLOAD_DIR}/{self.uid}/{download_dict[self.uid].name()}'):
                     share_url += '/'
                 if SHORTENER is not None and SHORTENER_API is not None:
-                    siurl = requests.get('https://{}/api?api={}&url={}&format=text'.format(SHORTENER, SHORTENER_API, share_url)).text
+                    siurl = requests.get(
+                        f'https://{SHORTENER}/api?api={SHORTENER_API}&url={share_url}&format=text'
+                    ).text
                     buttons.buildbutton("Index Link", siurl)
                 else:
                     buttons.buildbutton("Index Link", share_url)
@@ -225,17 +228,18 @@ def _mirror(bot, update, isTar=False, extract=False):
     link = link.strip()
     reply_to = update.message.reply_to_message
     if reply_to is not None:
-        file = None
         tag = reply_to.from_user.username
         media_array = [reply_to.document, reply_to.video, reply_to.audio]
-        for i in media_array:
-            if i is not None:
-                file = i
-                break
-
-        if not bot_utils.is_url(link) and not bot_utils.is_magnet(link) or len(link) == 0:
+        file = next((i for i in media_array if i is not None), None)
+        if (
+            not bot_utils.is_url(link)
+            and not bot_utils.is_magnet(link)
+            or not link
+        ):
             if file is not None:
-                if file.mime_type != "application/x-bittorrent":
+                if file.mime_type == "application/x-bittorrent":
+                    link = file.get_file().file_path
+                else:
                     listener = MirrorListener(bot, update, pswd, isTar, tag, extract)
                     tg_downloader = TelegramDownloadHelper(listener)
                     tg_downloader.add_download(reply_to, f'{DOWNLOAD_DIR}{listener.uid}/', name)
@@ -243,8 +247,6 @@ def _mirror(bot, update, isTar=False, extract=False):
                     if len(Interval) == 0:
                         Interval.append(setInterval(DOWNLOAD_STATUS_UPDATE_INTERVAL, update_all_messages))
                     return
-                else:
-                    link = file.get_file().file_path
     else:
         tag = None
     if not bot_utils.is_url(link) and not bot_utils.is_magnet(link):
